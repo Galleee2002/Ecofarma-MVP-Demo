@@ -1,0 +1,132 @@
+@import 'tailwindcss';
+
+@theme {
+    --font-sans: 'Source Sans Pro', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-heading: 'Lato', ui-sans-serif, system-ui, sans-serif;
+
+    --text-xs: 0.75rem;
+    --text-xs--line-height: 1.4;
+    --text-sm: 0.875rem;
+    --text-sm--line-height: 1.45;
+    --text-base: 1rem;
+    --text-base--line-height: 1.5;
+    --text-lg: 1.125rem;
+    --text-lg--line-height: 1.35;
+    --text-xl: 1.375rem;
+    --text-xl--line-height: 1.25;
+    --text-2xl: 1.75rem;
+    --text-2xl--line-height: 1.2;
+    --text-3xl: 2.25rem;
+    --text-3xl--line-height: 1.15;
+
+    --color-primary: #215b8d;
+    --color-primary-soft: #cedceb;
+    --color-accent: var(--color-primary-soft);
+    --color-secondary: #309ae6;
+    --color-icon: #52806c;
+    --color-success: #43b75d;
+    --color-danger: #ff3c3c;
+    --color-warning: #ffaa00;
+    --color-background: #eef4f6;
+    --color-foreground: #1a1a1a;
+    --color-muted: #6c757d;
+    --color-surface: #ffffff;
+    --color-line: #d3e0e6;
+
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+
+    --shadow-sm: 0 1px 2px rgb(33 91 141 / 0.08);
+    --shadow-md: 0 4px 12px rgb(33 91 141 / 0.1);
+    --shadow-lg: 0 12px 32px rgb(33 91 141 / 0.16);
+}
+
+@utility pagina {
+    margin-inline: auto;
+    display: flex;
+    width: 100%;
+    max-width: 64rem;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 2rem 1.5rem;
+}
+
+@utility pagina-media {
+    margin-inline: auto;
+    display: flex;
+    width: 100%;
+    max-width: 48rem;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 2rem 1.5rem;
+}
+
+@utility pagina-formulario {
+    margin-inline: auto;
+    display: flex;
+    width: 100%;
+    max-width: 28rem;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 2rem 1.5rem;
+}
+
+@utility fondo-trama {
+    background-color: var(--color-background);
+    background-image: url('/trama-web.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+@layer base {
+    body {
+        font-family: var(--font-sans);
+        font-size: var(--text-base);
+        line-height: var(--text-base--line-height);
+        font-weight: 400;
+        background-color: var(--color-background);
+        color: var(--color-foreground);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+        font-family: var(--font-heading);
+        font-weight: 700;
+    }
+
+    h1 {
+        font-size: var(--text-2xl);
+        line-height: var(--text-2xl--line-height);
+    }
+
+    h2 {
+        font-size: var(--text-xl);
+        line-height: var(--text-xl--line-height);
+    }
+
+    h3 {
+        font-size: var(--text-lg);
+        line-height: var(--text-lg--line-height);
+    }
+
+    h4 {
+        font-size: var(--text-base);
+        line-height: var(--text-base--line-height);
+    }
+
+    h5 {
+        font-size: var(--text-sm);
+        line-height: var(--text-sm--line-height);
+    }
+
+    input[type='checkbox'],
+    input[type='radio'] {
+        accent-color: var(--color-primary);
+    }
+}
