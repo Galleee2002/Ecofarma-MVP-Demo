@@ -52,7 +52,7 @@ function formatearFecha(fecha) {
 
         <dl class="grid min-w-0 grid-cols-2 gap-3">
             <div class="flex min-w-0 flex-col items-center gap-1.5 text-center">
-                <span class="text-primary" aria-hidden="true">
+                <span class="text-icon" aria-hidden="true">
                     <Pill :size="20" />
                 </span>
                 <div class="min-w-0">
@@ -61,7 +61,7 @@ function formatearFecha(fecha) {
                 </div>
             </div>
             <div class="flex min-w-0 flex-col items-center gap-1.5 text-center">
-                <span class="text-primary" aria-hidden="true">
+                <span class="text-icon" aria-hidden="true">
                     <Package :size="20" />
                 </span>
                 <div class="min-w-0">
@@ -70,7 +70,7 @@ function formatearFecha(fecha) {
                 </div>
             </div>
             <div class="flex min-w-0 flex-col items-center gap-1.5 text-center">
-                <span class="text-primary" aria-hidden="true">
+                <span class="text-icon" aria-hidden="true">
                     <Calendar :size="20" />
                 </span>
                 <div class="min-w-0">
@@ -79,7 +79,7 @@ function formatearFecha(fecha) {
                 </div>
             </div>
             <div class="flex min-w-0 flex-col items-center gap-1.5 text-center">
-                <span class="text-primary" aria-hidden="true">
+                <span class="text-icon" aria-hidden="true">
                     <Barcode :size="20" />
                 </span>
                 <div class="min-w-0">
@@ -93,7 +93,7 @@ function formatearFecha(fecha) {
             v-if="medicamento.descripcion"
             class="flex items-start gap-3 rounded-lg bg-primary-soft/60 p-4"
         >
-            <FileText class="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
+            <FileText class="mt-0.5 size-5 shrink-0 text-icon" aria-hidden="true" />
             <p class="min-w-0 text-pretty text-foreground">{{ medicamento.descripcion }}</p>
         </div>
     </article>
