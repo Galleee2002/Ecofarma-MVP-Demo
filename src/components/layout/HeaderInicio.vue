@@ -12,7 +12,7 @@ defineProps({
     },
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'buscar']);
 
 const { perfil, sesion, cerrarSesion, mostrarAviso } = useAuth();
 
@@ -139,7 +139,11 @@ async function confirmarCerrarSesion() {
             </RouterLink>
         </div>
 
-        <div class="relative">
+        <form
+            class="relative"
+            role="search"
+            @submit.prevent="emit('buscar')"
+        >
             <Search
                 :size="18"
                 stroke-width="1.75"
@@ -152,10 +156,17 @@ async function confirmarCerrarSesion() {
                 :value="modelValue"
                 placeholder="Buscar medicamento"
                 aria-label="Buscar medicamento"
-                class="w-full min-h-11 rounded-full border border-line bg-surface py-2.5 pr-4 pl-10 font-sans text-base text-foreground shadow-sm placeholder:text-muted transition duration-150 ease-out hover:border-primary focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transition-none"
+                class="w-full min-h-11 rounded-full border border-line bg-surface py-2.5 pr-24 pl-10 font-sans text-base text-foreground shadow-sm placeholder:text-muted transition duration-150 ease-out hover:border-primary focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transition-none"
                 @input="actualizarBusqueda"
             />
-        </div>
+            <BaseButton
+                type="submit"
+                size="sm"
+                class="absolute top-1/2 right-1.5 -translate-y-1/2"
+            >
+                Buscar
+            </BaseButton>
+        </form>
 
         <ModalExito
             v-model:open="modalCerrarSesion"

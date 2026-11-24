@@ -1,13 +1,15 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { useMedicamentos } from '../composables/useMedicamentos';
 import { usePaginacion } from '../composables/usePaginacion';
-import HeaderInicio from '../components/layout/HeaderInicio.vue';
-import LugaresAdheridos from '../components/layout/LugaresAdheridos.vue';
 import MedicamentoCard from '../components/medicamentos/MedicamentoCard.vue';
 import BaseAlert from '../components/ui/BaseAlert.vue';
 import BaseButton from '../components/ui/BaseButton.vue';
+import BaseInput from '../components/ui/BaseInput.vue';
+import { normalizarBusqueda } from '../lib/busquedaCatalogo';
 
+const route = useRoute();
 const { cargando, error, busqueda, filtroReceta, orden, medicamentosFiltrados, cargarMedicamentos } = useMedicamentos();
 
 const medicamentosPorPagina = 4;
@@ -22,12 +24,28 @@ const filtrosReceta = [
     { valor: 'sin_receta', etiqueta: 'Sin receta' },
 ];
 
+watch(
+    function () {
+        return route.query.busqueda;
+    },
+    function (query) {
+        busqueda.value = normalizarBusqueda(query);
+    },
+    { immediate: true },
+);
+
 onMounted(cargarMedicamentos);
 </script>
 
 <template>
     <main class="pagina">
-        <HeaderInicio v-model="busqueda" />
+        <BaseInput
+            id="busqueda-medicamentos"
+            v-model="busqueda"
+            type="search"
+            label="Buscar medicamentos"
+            placeholder="Nombre comercial o principio activo"
+        />
 
         <div class="flex flex-wrap gap-2" aria-label="Filtrar medicamentos por receta">
             <BaseButton
@@ -65,7 +83,5 @@ onMounted(cargarMedicamentos);
                 </BaseButton>
             </div>
         </template>
-
-        <LugaresAdheridos />
     </main>
 </template>

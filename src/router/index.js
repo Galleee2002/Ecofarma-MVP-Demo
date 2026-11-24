@@ -4,7 +4,8 @@ import { useAuth } from '../composables/useAuth';
 const routes = [
     {
         path: '/',
-        redirect: '/recibir',
+        name: 'home',
+        component: () => import('../views/HomeView.vue'),
     },
     {
         path: '/recibir',

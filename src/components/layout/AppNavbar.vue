@@ -8,7 +8,7 @@ const pestañas = [
     {
         id: 'inicio',
         etiqueta: 'Inicio',
-        destino: { name: 'recibir' },
+        destino: { name: 'home' },
         icono: House,
     },
     {
@@ -33,7 +33,7 @@ const pestañas = [
 
 function pestañaActiva(pestaña) {
     if (pestaña.id === 'inicio') {
-        return route.name === 'recibir' || route.name === 'catalogo' || route.name === 'medicamento-detalle';
+        return route.name === 'home' || route.name === 'recibir' || route.name === 'catalogo' || route.name === 'medicamento-detalle';
     }
     if (pestaña.id === 'donar') {
         return route.name === 'donar';
