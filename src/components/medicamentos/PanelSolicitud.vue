@@ -39,10 +39,6 @@ defineProps({
         type: String,
         default: '',
     },
-    mensajeCrear: {
-        type: String,
-        default: '',
-    },
     aceptoDdjj: {
         type: Boolean,
         default: false,
@@ -156,7 +152,6 @@ function enviar() {
                         </BaseCheckbox>
                     </template>
                     <BaseAlert v-if="errorCrear !== ''" variant="error" :message="errorCrear" />
-                    <BaseAlert v-if="mensajeCrear !== ''" variant="success" :message="mensajeCrear" />
                     <BaseButton
                         type="button"
                         variant="primary"

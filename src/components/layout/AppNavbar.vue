@@ -1,181 +1,81 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useAuth } from '../../composables/useAuth';
-import BaseButton from '../ui/BaseButton.vue';
-import BaseModal from '../ui/BaseModal.vue';
-import BaseNavbar from './BaseNavbar.vue';
-import UserMenu from './UserMenu.vue';
+import { useRoute } from 'vue-router';
+import { Building2, Heart, House, User } from '@lucide/vue';
 
 const route = useRoute();
-const router = useRouter();
-const { sesion, perfil, error, cargando, cerrarSesion, mostrarAviso, esperarSesionInicial, esperarPerfil } = useAuth();
-const authListo = ref(false);
-const confirmarCierre = ref(false);
 
-const esAdmin = computed(function () {
-    return perfil.value !== null && perfil.value.rol === 'admin';
-});
+const pestañas = [
+    {
+        id: 'inicio',
+        etiqueta: 'Inicio',
+        destino: { name: 'recibir' },
+        icono: House,
+    },
+    {
+        id: 'donar',
+        etiqueta: 'Donar',
+        destino: { name: 'donar' },
+        icono: Heart,
+    },
+    {
+        id: 'adheridos',
+        etiqueta: 'Adheridos',
+        destino: { name: 'adheridos' },
+        icono: Building2,
+    },
+    {
+        id: 'perfil',
+        etiqueta: 'Perfil',
+        destino: { name: 'perfil' },
+        icono: User,
+    },
+];
 
-const nombreUsuario = computed(function () {
-    if (perfil.value === null || typeof perfil.value.name !== 'string') {
-        return '';
-    }
-
-    const partes = perfil.value.name.trim().split(/\s+/);
-    if (partes[0] === undefined || partes[0] === '') {
-        return '';
-    }
-
-    return partes[0];
-});
-
-const enlaces = computed(function () {
-    return [
-        { id: 'catalogo', etiqueta: 'Catálogo', destino: { name: 'recibir' } },
-        { id: 'donar', etiqueta: 'Donar', destino: { name: 'donar' } },
-        { id: 'perfil', etiqueta: 'Mi Perfil', destino: { name: 'perfil' } },
-    ];
-});
-
-onMounted(async function () {
-    await esperarSesionInicial();
-    if (sesion.value !== null) {
-        await esperarPerfil();
-    }
-    authListo.value = true;
-});
-
-function enlaceActivo(enlace) {
-    if (enlace.id === 'catalogo') {
+function pestañaActiva(pestaña) {
+    if (pestaña.id === 'inicio') {
         return route.name === 'recibir' || route.name === 'catalogo' || route.name === 'medicamento-detalle';
     }
-    if (enlace.id === 'donar') {
+    if (pestaña.id === 'donar') {
         return route.name === 'donar';
     }
-    if (enlace.id === 'perfil') {
+    if (pestaña.id === 'adheridos') {
+        return route.name === 'adheridos';
+    }
+    if (pestaña.id === 'perfil') {
         return route.name === 'perfil';
     }
     return false;
 }
 
-function clasesEnlace(enlace, movil) {
-    const alto = movil ? 'min-h-11' : 'min-h-10';
-    const clases = [
-        'inline-flex items-center rounded-md px-3 py-2 font-semibold text-surface',
-        alto,
-        'transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current motion-reduce:transition-none',
-        'hover:bg-surface/10',
-    ];
-    if (enlaceActivo(enlace)) {
-        clases.push('bg-secondary/30');
-    }
-    return clases.join(' ');
-}
-
-function pedirCerrarSesion() {
-    confirmarCierre.value = true;
-}
-
-function cancelarCerrarSesion() {
-    if (cargando.value) {
-        return;
-    }
-    confirmarCierre.value = false;
-}
-
-async function confirmarCerrarSesion() {
-    const salio = await cerrarSesion();
-    if (salio) {
-        confirmarCierre.value = false;
-        mostrarAviso('Cerraste sesión correctamente.', 'exito');
-        router.push({ name: 'catalogo' });
-    } else if (error.value !== '') {
-        mostrarAviso(error.value, 'advertencia');
-    }
+function clasesPestaña(pestaña) {
+    const activa = pestañaActiva(pestaña);
+    return [
+        'flex min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-full px-2 py-1.5',
+        'font-heading text-xs transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-icon',
+        'motion-reduce:transition-none',
+        activa ? 'bg-primary-soft text-icon' : 'text-muted',
+    ].join(' ');
 }
 </script>
 
 <template>
-    <BaseNavbar sticky :logo-to="{ name: 'recibir' }">
-        <template #desktop-navigation>
-            <RouterLink
-                v-for="enlace in enlaces"
-                :key="enlace.id"
-                :to="enlace.destino"
-                :class="clasesEnlace(enlace, false)"
-                :aria-current="enlaceActivo(enlace) ? 'page' : undefined"
-            >
-                {{ enlace.etiqueta }}
-            </RouterLink>
-        </template>
-
-        <template #actions>
-            <template v-if="authListo && sesion !== null">
-                <UserMenu :es-admin="esAdmin" :nombre="nombreUsuario" @logout="pedirCerrarSesion" />
-            </template>
-            <template v-else-if="authListo">
-                <RouterLink
-                    :to="{ name: 'login' }"
-                    class="inline-flex min-h-11 items-center rounded-md px-3 py-2 font-semibold text-surface hover:bg-surface/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
-                >
-                    Ingresar
-                </RouterLink>
-                <RouterLink
-                    :to="{ name: 'registro' }"
-                    class="inline-flex min-h-11 items-center rounded-md bg-surface px-4 py-2 font-semibold text-primary transition hover:bg-surface/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current motion-reduce:transition-none"
-                >
-                    Registrarse
-                </RouterLink>
-            </template>
-        </template>
-
-        <template #mobile-navigation>
-            <RouterLink
-                v-for="enlace in enlaces"
-                :key="enlace.id"
-                :to="enlace.destino"
-                :class="clasesEnlace(enlace, true)"
-                :aria-current="enlaceActivo(enlace) ? 'page' : undefined"
-            >
-                {{ enlace.etiqueta }}
-            </RouterLink>
-        </template>
-
-        <template #mobile-actions>
-            <template v-if="authListo && sesion !== null">
-                <UserMenu modo="mobile" :es-admin="esAdmin" @logout="pedirCerrarSesion" />
-            </template>
-            <template v-else-if="authListo">
-                <RouterLink
-                    :to="{ name: 'login' }"
-                    class="inline-flex min-h-11 items-center rounded-md px-3 py-2 font-semibold text-surface hover:bg-surface/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
-                >
-                    Ingresar
-                </RouterLink>
-                <RouterLink
-                    :to="{ name: 'registro' }"
-                    class="inline-flex min-h-11 items-center justify-center rounded-md bg-surface px-4 py-2 font-semibold text-primary transition hover:bg-surface/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current motion-reduce:transition-none"
-                >
-                    Registrarse
-                </RouterLink>
-            </template>
-        </template>
-    </BaseNavbar>
-
-    <BaseModal
-        v-model:open="confirmarCierre"
-        variant="danger"
-        size="sm"
-        title="Cerrar sesión"
-        description="Vas a salir de ecofarma en este dispositivo."
-        :locked="cargando"
-        :close-on-backdrop="!cargando"
-        :close-on-esc="!cargando"
+    <nav
+        aria-label="Navegación principal"
+        class="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
     >
-        <template #footer>
-            <BaseButton variant="outline" :disabled="cargando" @click="cancelarCerrarSesion">Cancelar</BaseButton>
-            <BaseButton variant="danger" :loading="cargando" @click="confirmarCerrarSesion">Cerrar sesión</BaseButton>
-        </template>
-    </BaseModal>
+        <div
+            class="pointer-events-auto flex w-full max-w-md items-center gap-1 rounded-full bg-surface p-1.5 shadow-md"
+        >
+            <RouterLink
+                v-for="pestaña in pestañas"
+                :key="pestaña.id"
+                :to="pestaña.destino"
+                :class="clasesPestaña(pestaña)"
+                :aria-current="pestañaActiva(pestaña) ? 'page' : undefined"
+            >
+                <component :is="pestaña.icono" :size="22" stroke-width="1.75" aria-hidden="true" />
+                <span>{{ pestaña.etiqueta }}</span>
+            </RouterLink>
+        </div>
+    </nav>
 </template>

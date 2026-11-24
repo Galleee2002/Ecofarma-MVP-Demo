@@ -13,7 +13,7 @@ import BaseTextarea from '../components/ui/BaseTextarea.vue';
 import { useAuth } from '../composables/useAuth';
 import { useVademecum } from '../composables/useVademecum';
 import { useDonaciones } from '../composables/useDonaciones';
-import { useToast } from '../composables/useToast';
+import { useModalExito } from '../composables/useModalExito';
 
 defineOptions({
     name: 'DonarView',
@@ -21,10 +21,10 @@ defineOptions({
 
 const MAXIMO_FOTOS = 3;
 const DURACION_PREPARACION = 700;
-const { sesion, perfil, errorPerfil, mostrarAviso } = useAuth();
+const { sesion, perfil, errorPerfil } = useAuth();
 const { filas: sugerencias, error: errorSugerencias, cargarSugerencias } = useVademecum();
-const { publicando, errorPublicar, mensajePublicar, tipoMensajePublicar, publicarDonacion } = useDonaciones();
-const { info: mostrarInfo } = useToast();
+const { publicando, errorPublicar, mensajePublicar, tipoMensajePublicar, validarPublicacion, publicarDonacion } = useDonaciones();
+const { mostrar: mostrarModalExito } = useModalExito();
 
 const datos = ref({
     nombre_comercial: '',
@@ -38,10 +38,43 @@ const datos = ref({
 });
 const fotos = ref([]);
 const avisoFotos = ref('');
+const paso = ref('formulario');
 
 const cuentaSuspendida = computed(function () {
     return perfil.value !== null && perfil.value.is_validado === false;
 });
+
+const fechaVencimientoFormateada = computed(function () {
+    if (datos.value.fecha_vencimiento === '') {
+        return '';
+    }
+    const partes = datos.value.fecha_vencimiento.split('-');
+    if (partes.length !== 3) {
+        return datos.value.fecha_vencimiento;
+    }
+    const fecha = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]));
+    return fecha.toLocaleDateString('es-AR');
+});
+
+function archivosDeFotos() {
+    const archivos = [];
+    for (const foto of fotos.value) {
+        archivos.push(foto.archivo);
+    }
+    return archivos;
+}
+
+function irAResumen() {
+    if (!validarPublicacion(datos.value, archivosDeFotos())) {
+        return;
+    }
+    paso.value = 'resumen';
+}
+
+function volverAEditar() {
+    errorPublicar.value = '';
+    paso.value = 'formulario';
+}
 
 function obtenerFechaDeManiana() {
     const maniana = new Date();
@@ -265,19 +298,18 @@ function limpiarFotos() {
     fotos.value = [];
 }
 
-async function publicar() {
-    const archivos = [];
-    for (const foto of fotos.value) {
-        archivos.push(foto.archivo);
+function mostrarExitoDonacion() {
+    if (tipoMensajePublicar.value === 'exito') {
+        mostrarModalExito('Medicamento publicado', mensajePublicar.value);
+        return;
     }
+    mostrarModalExito('Donación recibida', mensajePublicar.value);
+}
 
-    const publicada = await publicarDonacion(sesion.value.user.id, datos.value, archivos);
+async function publicar() {
+    const publicada = await publicarDonacion(sesion.value.user.id, datos.value, archivosDeFotos());
     if (publicada) {
-        if (tipoMensajePublicar.value === 'exito') {
-            mostrarAviso(mensajePublicar.value, 'exito');
-        } else {
-            mostrarInfo(mensajePublicar.value, { duration: 3000 });
-        }
+        mostrarExitoDonacion();
         mensajePublicar.value = '';
         datos.value = {
             nombre_comercial: '',
@@ -290,6 +322,7 @@ async function publicar() {
             descripcion: '',
         };
         limpiarFotos();
+        paso.value = 'formulario';
     }
 }
 
@@ -303,13 +336,97 @@ onBeforeUnmount(limpiarFotos);
         <div class="pagina-media">
             <header class="flex flex-col gap-1">
                 <h1 class="text-balance text-primary">Donar un medicamento</h1>
-                <p class="text-pretty text-muted">Publicá un medicamento para que otra persona pueda solicitarlo.</p>
+                <p v-if="paso === 'resumen'" class="text-pretty text-muted">
+                    Revisá los datos antes de enviar.
+                </p>
+                <p v-else class="text-pretty text-muted">
+                    Publicá un medicamento para que otra persona pueda solicitarlo.
+                </p>
             </header>
 
             <BaseAlert v-if="errorPerfil !== ''" variant="error" :message="errorPerfil" />
             <p v-else-if="perfil === null" class="text-muted">Cargando tus datos...</p>
 
-            <form v-else novalidate @submit.prevent="publicar">
+            <template v-else-if="paso === 'resumen'">
+                <BaseCard variant="surface" padding="md" bordered class="rounded-lg shadow-sm sm:p-8">
+                    <div class="flex flex-col gap-4">
+                        <BaseAlert
+                            v-if="cuentaSuspendida"
+                            variant="warning"
+                            message="Tu cuenta está suspendida, no podés publicar donaciones."
+                        />
+                        <h2 class="text-balance text-primary">{{ datos.nombre_comercial }}</h2>
+                        <dl class="flex flex-col gap-3">
+                            <div class="flex min-w-0 flex-col gap-0.5">
+                                <dt class="text-sm text-muted">Principio activo</dt>
+                                <dd class="text-foreground">{{ datos.principio_activo }}</dd>
+                            </div>
+                            <div class="flex min-w-0 flex-col gap-0.5">
+                                <dt class="text-sm text-muted">Concentración</dt>
+                                <dd class="text-foreground">{{ datos.concentracion }}</dd>
+                            </div>
+                            <div class="flex min-w-0 flex-col gap-0.5">
+                                <dt class="text-sm text-muted">Forma farmacéutica</dt>
+                                <dd class="text-foreground">{{ datos.forma_farmaceutica }}</dd>
+                            </div>
+                            <div class="flex min-w-0 flex-col gap-0.5">
+                                <dt class="text-sm text-muted">Cantidad</dt>
+                                <dd class="text-foreground">{{ datos.cantidad_disponible }}</dd>
+                            </div>
+                            <div class="flex min-w-0 flex-col gap-0.5">
+                                <dt class="text-sm text-muted">Lote</dt>
+                                <dd class="text-foreground">{{ datos.lote }}</dd>
+                            </div>
+                            <div class="flex min-w-0 flex-col gap-0.5">
+                                <dt class="text-sm text-muted">Fecha de vencimiento</dt>
+                                <dd class="text-foreground">{{ fechaVencimientoFormateada }}</dd>
+                            </div>
+                            <div v-if="datos.descripcion.trim() !== ''" class="flex min-w-0 flex-col gap-0.5">
+                                <dt class="text-sm text-muted">Descripción</dt>
+                                <dd class="text-pretty text-foreground">{{ datos.descripcion }}</dd>
+                            </div>
+                        </dl>
+                        <div v-if="fotos.length > 0" class="flex flex-col gap-2">
+                            <p class="text-sm text-muted">Fotos del envase</p>
+                            <ul class="flex flex-wrap gap-3">
+                                <li v-for="foto in fotos" :key="foto.url">
+                                    <img
+                                        :src="foto.url"
+                                        :alt="foto.archivo.name"
+                                        class="h-20 w-20 rounded-md border border-line object-cover"
+                                    />
+                                </li>
+                            </ul>
+                        </div>
+                        <BaseAlert v-if="errorPublicar !== ''" variant="error" :message="errorPublicar" />
+                        <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                            <BaseButton
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                class="w-full sm:w-auto"
+                                :disabled="publicando"
+                                @click="volverAEditar"
+                            >
+                                Volver a editar
+                            </BaseButton>
+                            <BaseButton
+                                type="button"
+                                variant="primary"
+                                size="sm"
+                                class="w-full sm:w-auto"
+                                :disabled="cuentaSuspendida"
+                                :loading="publicando"
+                                @click="publicar"
+                            >
+                                {{ publicando ? 'Enviando...' : 'Enviar donación' }}
+                            </BaseButton>
+                        </div>
+                    </div>
+                </BaseCard>
+            </template>
+
+            <form v-else novalidate @submit.prevent="irAResumen">
                 <BaseCard variant="surface" padding="md" class="rounded-lg shadow-md sm:p-8">
                     <div class="flex flex-col gap-4">
                         <BaseAlert
@@ -491,9 +608,8 @@ onBeforeUnmount(limpiarFotos);
                                 variant="primary"
                                 class="w-full min-w-0 sm:w-auto"
                                 :disabled="cuentaSuspendida"
-                                :loading="publicando"
                             >
-                                {{ publicando ? 'Publicando...' : 'Publicar donación' }}
+                                Revisar donación
                             </BaseButton>
                         </div>
                     </div>

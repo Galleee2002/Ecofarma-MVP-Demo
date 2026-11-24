@@ -35,13 +35,21 @@ export function useDonaciones() {
         cargado.value = true;
     }
 
+    function validarPublicacion(datos, fotos) {
+        errorPublicar.value = '';
+        const errorValidacion = validarDonacion(datos, fotos);
+        if (errorValidacion !== '') {
+            errorPublicar.value = errorValidacion;
+            return false;
+        }
+        return true;
+    }
+
     async function publicarDonacion(userId, datos, fotos) {
         errorPublicar.value = '';
         mensajePublicar.value = '';
 
-        const errorValidacion = validarDonacion(datos, fotos);
-        if (errorValidacion !== '') {
-            errorPublicar.value = errorValidacion;
+        if (!validarPublicacion(datos, fotos)) {
             return false;
         }
 
@@ -78,6 +86,7 @@ export function useDonaciones() {
         mensajePublicar,
         tipoMensajePublicar,
         cargarMisDonaciones,
+        validarPublicacion,
         publicarDonacion,
     };
 }

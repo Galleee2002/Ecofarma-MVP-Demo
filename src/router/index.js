@@ -50,6 +50,11 @@ const routes = [
         meta: { requiereSesion: true },
     },
     {
+        path: '/adheridos',
+        name: 'adheridos',
+        component: () => import('../views/AdheridosView.vue'),
+    },
+    {
         path: '/donar',
         name: 'donar',
         component: () => import('../views/DonarView.vue'),

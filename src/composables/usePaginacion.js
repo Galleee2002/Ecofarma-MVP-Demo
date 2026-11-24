@@ -2,7 +2,7 @@ import { computed, ref, watch } from 'vue';
 
 export const POR_PAGINA = 15;
 
-export function usePaginacion(lista, alCambiarFiltro) {
+export function usePaginacion(lista, alCambiarFiltro, porPagina = POR_PAGINA) {
     const pagina = ref(1);
 
     watch(alCambiarFiltro, function () {
@@ -10,7 +10,7 @@ export function usePaginacion(lista, alCambiarFiltro) {
     });
 
     watch(lista, function () {
-        const ultima = Math.ceil(lista.value.length / POR_PAGINA);
+        const ultima = Math.ceil(lista.value.length / porPagina);
         if (ultima < 1) {
             pagina.value = 1;
             return;
@@ -25,8 +25,8 @@ export function usePaginacion(lista, alCambiarFiltro) {
     });
 
     const visibles = computed(function () {
-        const inicio = (pagina.value - 1) * POR_PAGINA;
-        return lista.value.slice(inicio, inicio + POR_PAGINA);
+        const inicio = (pagina.value - 1) * porPagina;
+        return lista.value.slice(inicio, inicio + porPagina);
     });
 
     return {

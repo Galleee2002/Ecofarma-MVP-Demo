@@ -8,6 +8,7 @@ import FichaMedicamento from '../components/medicamentos/FichaMedicamento.vue';
 import PanelSolicitud from '../components/medicamentos/PanelSolicitud.vue';
 import { useAuth } from '../composables/useAuth';
 import { useMedicamentos } from '../composables/useMedicamentos';
+import { useModalExito } from '../composables/useModalExito';
 import { useSolicitudes } from '../composables/useSolicitudes';
 
 defineOptions({
@@ -18,7 +19,8 @@ const route = useRoute();
 const router = useRouter();
 const { sesion, perfil, errorPerfil } = useAuth();
 const { medicamento, cargando, error, cargarMedicamentoPorId } = useMedicamentos();
-const { creando, errorCrear, mensajeCrear, crearSolicitud } = useSolicitudes();
+const { creando, errorCrear, crearSolicitud } = useSolicitudes();
+const { mostrar: mostrarModalExito } = useModalExito();
 
 const aceptoDdjj = ref(false);
 const archivoReceta = ref(null);
@@ -95,6 +97,10 @@ async function solicitar() {
     if (creada) {
         aceptoDdjj.value = false;
         archivoReceta.value = null;
+        mostrarModalExito(
+            'Solicitud enviada',
+            'El código de retiro lo vas a ver en Mis solicitudes, dentro de tu perfil.',
+        );
     }
 }
 </script>
@@ -132,7 +138,6 @@ async function solicitar() {
                 :creando="creando"
                 :error-perfil="errorPerfil"
                 :error-crear="errorCrear"
-                :mensaje-crear="mensajeCrear"
                 @elegir-receta="elegirReceta"
                 @login="irALogin"
                 @enviar="solicitar"
