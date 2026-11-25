@@ -1,0 +1,15 @@
+*.log
+.DS_Store
+Thumbs.db
+.env
+.env.*
+!.env.example
+/.codex
+/.cursor/
+/.idea
+/.vscode
+/.zed
+/node_modules
+/dist
+/supabase/.temp
+/supabase/.branches

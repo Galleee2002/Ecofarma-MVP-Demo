@@ -1,0 +1,9 @@
+Carrera: Diseño Web y Programación  
+Materia: Clientes Web Mobile
+Cuatrimestre: 4to 
+Año: 2026
+Turno: Noche
+Comisión: DWN4AP
+Apellido y nombre: Gael Garcia - Milagros Sol Kuringhian - Ada Luz Colman
+Docente: Santiago Gallino
+Carácter de entrega: Proyecto Final
