@@ -1,6 +1,6 @@
 <script setup>
 import { useRoute } from 'vue-router';
-import { Building2, Heart, House, User } from '@lucide/vue';
+import { HandHeart, Heart, House, User } from '@lucide/vue';
 
 const route = useRoute();
 
@@ -18,10 +18,10 @@ const pestañas = [
         icono: Heart,
     },
     {
-        id: 'adheridos',
-        etiqueta: 'Adheridos',
-        destino: { name: 'adheridos' },
-        icono: Building2,
+        id: 'recibir',
+        etiqueta: 'Recibir',
+        destino: { name: 'recibir' },
+        icono: HandHeart,
     },
     {
         id: 'perfil',
@@ -33,13 +33,13 @@ const pestañas = [
 
 function pestañaActiva(pestaña) {
     if (pestaña.id === 'inicio') {
-        return route.name === 'home' || route.name === 'recibir' || route.name === 'catalogo' || route.name === 'medicamento-detalle';
+        return route.name === 'home';
     }
     if (pestaña.id === 'donar') {
         return route.name === 'donar';
     }
-    if (pestaña.id === 'adheridos') {
-        return route.name === 'adheridos';
+    if (pestaña.id === 'recibir') {
+        return route.name === 'recibir' || route.name === 'catalogo' || route.name === 'medicamento-detalle';
     }
     if (pestaña.id === 'perfil') {
         return route.name === 'perfil';

@@ -41,7 +41,7 @@ function useLoginForm(route, router, iniciarSesion, mostrarAviso) {
 </script>
 
 <template>
-    <main class="fondo-trama flex min-h-[calc(100dvh-5rem)] items-start justify-center px-4 py-6 sm:items-center sm:py-10">
+    <main class="fondo-trama-login flex min-h-[calc(100dvh-5rem)] items-start justify-center px-4 py-6 sm:items-center sm:py-10">
         <div class="flex w-full max-w-md flex-col gap-4">
             <RouterLink :to="{ name: 'catalogo' }" class="w-fit text-primary">Volver al catálogo</RouterLink>
             <BaseCard variant="surface" padding="lg" class="w-full rounded-md shadow-md">
